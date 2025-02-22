@@ -107,10 +107,30 @@ func detectOriginURL() (url string) {
 
 	for _, s := range strings.Split(output, "\n") {
 		s = strings.TrimSpace(strings.TrimPrefix(s, "origin"))
-		if strings.HasPrefix(s, "https://github.com/") && strings.Contains(s, "push") {
-			pterm.Debug.Printfln("Detected GitHub Repo: %s", s)
-			url = strings.TrimSpace(strings.TrimRight(s, "(push)"))
 
+		// Handle HTTPS URLs
+		if strings.HasPrefix(s, "https://github.com/") && strings.Contains(s, "push") {
+			pterm.Debug.Printfln("Detected GitHub HTTPS Repo: %s", s)
+			url = strings.TrimSpace(strings.TrimRight(s, "(push)"))
+			return
+		}
+
+		// Handle SSH URLs
+		if strings.HasPrefix(s, "git@github.com:") && strings.Contains(s, "push") {
+			pterm.Debug.Printfln("Detected GitHub SSH Repo: %s", s)
+			sshURL := strings.TrimSpace(strings.TrimRight(s, "(push)"))
+			// Convert SSH URL to HTTPS format
+			// From: git@github.com:username/repo.git
+			// To: https://github.com/username/repo
+			url = strings.TrimSuffix(
+				strings.Replace(
+					strings.Replace(sshURL, "git@github.com:", "https://github.com/", 1),
+					".git",
+					"",
+					1,
+				),
+				".git",
+			)
 			return
 		}
 	}
