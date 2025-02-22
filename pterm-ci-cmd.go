@@ -2,7 +2,6 @@ package pcli
 
 import (
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -41,7 +40,7 @@ It should not be used outside the development of this tool.`,
 		pterm.DefaultSection.Println("Generating markdown documentation")
 
 		markdownDoc := GenerateMarkdownDoc(rootCmd)
-		pterm.Fatal.PrintOnError(ioutil.WriteFile(getPathTo("/docs/docs.md"), []byte(markdownDoc.Markdown), 0777))
+		pterm.Fatal.PrintOnError(os.WriteFile(getPathTo("/docs/docs.md"), []byte(markdownDoc.Markdown), 0777))
 
 		project := struct {
 			ProjectPath string
@@ -78,7 +77,7 @@ It should not be used outside the development of this tool.`,
 		pterm.DefaultSection.Println("Processing '*.template.[md|html|js|css]' files")
 
 		walkOverExt("", ".template.md,.template.html,.template.js,.template.css", func(path string) {
-			contentBytes, err := ioutil.ReadFile(path)
+			contentBytes, err := os.ReadFile(path)
 			content := string(contentBytes)
 			tmpl, err := template.New(filepath.Base(path)).Parse(content)
 			pterm.Fatal.PrintOnError(err)
@@ -90,9 +89,9 @@ It should not be used outside the development of this tool.`,
 
 		pterm.DefaultSection.Println("Copying README.md to docs/REAMDE.md")
 
-		input, err := ioutil.ReadFile(getPathTo("/README.md"))
+		input, err := os.ReadFile(getPathTo("/README.md"))
 		pterm.Fatal.PrintOnError(err)
-		pterm.Fatal.PrintOnError(ioutil.WriteFile(getPathTo("/docs/README.md"), input, 0777))
+		pterm.Fatal.PrintOnError(os.WriteFile(getPathTo("/docs/README.md"), input, 0777))
 
 		pterm.Success.Printfln("The PTerm-CI System took %v to complete.", time.Since(started))
 	},
