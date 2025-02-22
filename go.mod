@@ -1,4 +1,4 @@
-module github.com/pterm/pcli
+module github.com/MagdielCAS/pcli
 
 go 1.21
 
